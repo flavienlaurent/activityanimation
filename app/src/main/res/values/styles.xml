@@ -1,0 +1,20 @@
+<resources>
+
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar"></style>
+
+    <style name="AppTheme.Transparent" parent="@style/AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="DefaultText">
+        <item name="android:shadowColor">@android:color/black</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+
+</resources>
