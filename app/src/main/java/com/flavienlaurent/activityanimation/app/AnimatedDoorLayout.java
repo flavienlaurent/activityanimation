@@ -1,8 +1,10 @@
 package com.flavienlaurent.activityanimation.app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import android.view.ViewGroup;
 public class AnimatedDoorLayout extends ViewGroup {
 
     private static final String TAG = "AnimatedDoorLayout";
+
+    static final boolean IS_JBMR2 = Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2;
 
     public static final int HORIZONTAL_DOOR = 1;
     public static final int VERTICAL_DOOR = 2;
@@ -22,6 +26,9 @@ public class AnimatedDoorLayout extends ViewGroup {
     private int mDoorType;
 
     private float mProgress;
+
+    private Bitmap mFullBitmap;
+
     public AnimatedDoorLayout(Context context) {
         super(context);
     }
@@ -92,7 +99,14 @@ public class AnimatedDoorLayout extends ViewGroup {
 
         mOriginalWidth = getMeasuredWidth();
         mOriginalHeight = getMeasuredHeight();
+
+        if (IS_JBMR2) {
+            mFullBitmap = Bitmap.createBitmap(mOriginalWidth, mOriginalHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(mFullBitmap);
+            getChildAt(0).draw(canvas);
+        }
     }
+
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
@@ -115,8 +129,12 @@ public class AnimatedDoorLayout extends ViewGroup {
         } else {
             mRect.set(0, 0, delta, mOriginalHeight);
         }
-        canvas.clipRect(mRect);
-        super.dispatchDraw(canvas);
+        if (IS_JBMR2) {
+            canvas.drawBitmap(mFullBitmap, mRect, mRect, null);
+        } else {
+            canvas.clipRect(mRect);
+            super.dispatchDraw(canvas);
+        }
         canvas.restore();
 
         //2nd door
@@ -126,8 +144,12 @@ public class AnimatedDoorLayout extends ViewGroup {
         } else {
             mRect.set(mOriginalWidth - delta, 0, mOriginalWidth, mOriginalHeight);
         }
-        canvas.clipRect(mRect);
-        super.dispatchDraw(canvas);
+        if (IS_JBMR2) {
+            canvas.drawBitmap(mFullBitmap, mRect, mRect, null);
+        } else {
+            canvas.clipRect(mRect);
+            super.dispatchDraw(canvas);
+        }
         canvas.restore();
     }
 }
