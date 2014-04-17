@@ -1,8 +1,10 @@
 package com.flavienlaurent.activityanimation.app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
@@ -20,6 +22,8 @@ public class AnimatedRectLayout extends ViewGroup {
 
     public static final int RECT_COUNT_IN_WIDTH = 10;
 
+    static final boolean IS_JBMR2 = Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2;
+
     private static SparseArray<IndexesBuilder> sIndexesBuilder = new SparseArray<IndexesBuilder>();
 
     private int mAnimationType;
@@ -31,6 +35,8 @@ public class AnimatedRectLayout extends ViewGroup {
     private int[][] mRectIndexes;
 
     private float mProgress;
+
+    private Bitmap mFullBitmap;
 
     public AnimatedRectLayout(Context context) {
         super(context);
@@ -140,6 +146,12 @@ public class AnimatedRectLayout extends ViewGroup {
         }
 
         sIndexesBuilder.get(mAnimationType).build(mRectIndexes, mRectCountInWidth, mRectCountInHeight);
+
+        if (IS_JBMR2) {
+            mFullBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(mFullBitmap);
+            getChildAt(0).draw(canvas);
+        }
     }
 
     @Override
@@ -158,8 +170,14 @@ public class AnimatedRectLayout extends ViewGroup {
             canvas.save();
 
             int[] index = mRectIndexes[i];
-            canvas.clipRect(mRects[index[0]][index[1]]);
-            super.dispatchDraw(canvas);
+            Rect rect = mRects[index[0]][index[1]];
+
+            if(IS_JBMR2) {
+                canvas.drawBitmap(mFullBitmap, rect, rect, null);
+            } else {
+                canvas.clipRect(rect);
+                super.dispatchDraw(canvas);
+            }
 
             canvas.restore();
         }
